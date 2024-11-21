@@ -14,14 +14,18 @@
 #include "Color.h"
 #include "Matrix.h"
 
+#include <vector>
+
 class Planet {
 private:
 	Color  color    = Red;
 	int    radius   = 10;
 	CVec2f position = CVec2f(0.0);
+	Planet *child = nullptr;
 
 public:
 	Planet() { }
+	Planet(Planet * _child) : child(_child) { }
 
 	// getter
 	Color  getColor   () const { return color; }
@@ -32,7 +36,13 @@ public:
 	void setColor   (const Color&  c) { color    = c; }
 	void setRadius  (int           r) { radius   = std::max(1, r); }
 	
-	void setPosition(const CVec2f& p) { this->position = p; }
+	void setPosition(const CVec2f& p) {
+		if (this->child != nullptr) {
+			CVec2f cp = child->getPosition() - this->position;
+			child->setPosition(cp + p);
+		} 
+		this->position = p;
+	 }
 	
 	// draw
 	void draw() const; // Implement in this method your Bresenham algorithm for circles 

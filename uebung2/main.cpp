@@ -13,6 +13,7 @@
 #include <GL/glut.h>
 
 #include "Planet.h"
+#include "exercise3.h"
 
 ////////////////////////////////////////////////////////////
 //
@@ -27,9 +28,10 @@ int g_WinHeight = 800;
 int g_iTimerMSecs;
 
 
-Planet moon;
-Planet earth;
-Planet sun;
+Planet comet;
+Planet moon(&comet);
+Planet earth(&moon);
+Planet sun(&earth);
 
 //
 /////////////////////////////////////////////////////////////
@@ -54,14 +56,18 @@ void init ()
 	sun.setColor(Yellow);
 	earth.setColor(Green);
 	moon.setColor(Blue);
+	comet.setColor(Cyan);
 
 	sun.setPosition(CVec2f(0, 0));
 	earth.setPosition(CVec2f(200, 0));
-	moon.setPosition(CVec2f(270, 0));
+	moon.setPosition(CVec2f(290, 0));
+	comet.setPosition(CVec2f(320, 0));
+
 
 	sun.setRadius(80);
 	earth.setRadius(40);
 	moon.setRadius(20);
+	comet.setRadius(5);
 
 	// init timer interval
 	g_iTimerMSecs = 10;
@@ -108,30 +114,13 @@ void reshape(int w, int h)
 	glutPostRedisplay();
 }
 
-void rotateAroundOrigin(Planet& planet, float theta) {
-	CVec2f p = rotateMat(theta) * planet.getPosition();
-	planet.setPosition(p);
-}
-
-void rotateAroundPoint(const CVec2f& point, const CVec2f& a, Planet& planet, float theta) {
-   // Step 1: Translate the planet's position relative to the center (point)
-    CVec2f translatedPosition = planet.getPosition() - point;
-
-    // Step 2: Rotate the translated position
-    CVec2f rotatedPosition = rotateMat(theta) * translatedPosition;
-
-    // Step 3: Translate back by adding the point to the rotated position
-    planet.setPosition(rotatedPosition + point);
-}
-
+float factor = 1.0f;
 // timer callback function
 void timer (int value) 
 {
 	///////
 	// UPDATE YOUR VARIABLES HERE ...
 	//
-	rotateAroundOrigin(earth, 0.005f);
-	rotateAroundPoint(earth.getPosition(), CVec2f(10, 0), moon, 0.005f);
 
 	//
 	///////
@@ -155,17 +144,22 @@ void timer (int value)
 // display callback function for EXERCISE 3
 void displayExercise3(void)
 {
+	affineRotateAroundOrigin(earth, 0.02f * factor);
+	affineRotateAroundPoint(earth.getPosition(), moon, 0.05f * factor);
+	affineRotateAroundPoint(moon.getPosition(), comet, 0.1f * factor);
 
 	glClear (GL_COLOR_BUFFER_BIT);
 
 	sun.draw();
 	earth.draw();
 	moon.draw();
+	comet.draw();
 
 	// In double buffer mode the last two lines should always be
 	glFlush ();
 	glutSwapBuffers (); // swap front and back buffer
 }
+
 
 // display callback function for EXERCISE 4
 void displayExercise4(void)
@@ -191,6 +185,15 @@ void keyboard (unsigned char key, int x, int y)
 			break;
 		case '2':
 			glutDisplayFunc (displayExercise4);
+			break;
+		case '+':
+			factor += 0.05f;
+			break;
+		case '-':
+			factor -= 0.05f;
+			break;
+		case ' ':
+			factor = 1.0f;
 			break;
 		default:
 			// do nothing ...
