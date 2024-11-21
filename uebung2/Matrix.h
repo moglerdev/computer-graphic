@@ -135,3 +135,10 @@ typedef CMatrix<double, 3> CMat3d;
 typedef CMatrix<double, 4> CMat4d;
 
 CMat4d affineInverse(const CMat4d& M);	// inverse of AFFINE MAP only!!!
+
+CMat2f rotateMat(const float theta) {
+	CMat2f m;
+	m.setRow(CVec2f(cos(theta), -sin(theta)), 0);
+	m.setRow(CVec2f(sin(theta), cos(theta)), 1);
+	return m;
+}

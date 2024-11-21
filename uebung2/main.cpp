@@ -12,6 +12,8 @@
 // Include-File for GLUT-Library
 #include <GL/glut.h>
 
+#include "Planet.h"
+
 ////////////////////////////////////////////////////////////
 //
 // system relevant global variables
@@ -23,6 +25,11 @@ int g_WinHeight = 800;
 
 // global variable to tune the timer interval
 int g_iTimerMSecs;
+
+
+Planet moon;
+Planet earth;
+Planet sun;
 
 //
 /////////////////////////////////////////////////////////////
@@ -40,9 +47,22 @@ CVec2i g_vecPosIncr;	// (used in display2)
 //
 /////////////////////////////////////////////////////////////
 
+
 // Function to initialize our own variables
 void init () 
 {
+	sun.setColor(Yellow);
+	earth.setColor(Green);
+	moon.setColor(Blue);
+
+	sun.setPosition(CVec2f(0, 0));
+	earth.setPosition(CVec2f(200, 0));
+	moon.setPosition(CVec2f(270, 0));
+
+	sun.setRadius(80);
+	earth.setRadius(40);
+	moon.setRadius(20);
+
 	// init timer interval
 	g_iTimerMSecs = 10;
 
@@ -88,13 +108,30 @@ void reshape(int w, int h)
 	glutPostRedisplay();
 }
 
+void rotateAroundOrigin(Planet& planet, float theta) {
+	CVec2f p = rotateMat(theta) * planet.getPosition();
+	planet.setPosition(p);
+}
+
+void rotateAroundPoint(const CVec2f& point, const CVec2f& a, Planet& planet, float theta) {
+   // Step 1: Translate the planet's position relative to the center (point)
+    CVec2f translatedPosition = planet.getPosition() - point;
+
+    // Step 2: Rotate the translated position
+    CVec2f rotatedPosition = rotateMat(theta) * translatedPosition;
+
+    // Step 3: Translate back by adding the point to the rotated position
+    planet.setPosition(rotatedPosition + point);
+}
+
 // timer callback function
 void timer (int value) 
 {
 	///////
 	// UPDATE YOUR VARIABLES HERE ...
 	//
-
+	rotateAroundOrigin(earth, 0.005f);
+	rotateAroundPoint(earth.getPosition(), CVec2f(10, 0), moon, 0.005f);
 
 	//
 	///////
@@ -121,21 +158,9 @@ void displayExercise3(void)
 
 	glClear (GL_COLOR_BUFFER_BIT);
 
-	///////
-	// remove the lines from "glBegin(...)" to "glEnd();" 
-	// 
-	// and display your planet data of EXERCISE 3 here 
-	// using the AFFINE implementation of affine maps.
-	//
-
-	glBegin (GL_TRIANGLES);
-	glColor3f (1,0,0);	glVertex2i ( int(g_iPos),           0 );
-	glColor3f (0,1,0);	glVertex2i (-int(g_iPos),  int(g_iPos));
-	glColor3f (0,0,1);	glVertex2i (-int(g_iPos), -int(g_iPos));
-	glEnd ();
-
-	//
-	///////
+	sun.draw();
+	earth.draw();
+	moon.draw();
 
 	// In double buffer mode the last two lines should always be
 	glFlush ();
@@ -147,22 +172,7 @@ void displayExercise4(void)
 {
 	glClear (GL_COLOR_BUFFER_BIT);
 
-	///////
-	// remove the lines from "glBegin(...)" to "glEnd();" 
-	// 
-	// and display your planet data of EXERCISE 4 here 
-	// using the HOMOGENEOUS implementation of affine maps.
-	//
 
-	glBegin (GL_QUADS);
-	glColor3f(1, 0, 0);	glVertex2i(-g_vecPos[1], -g_vecPos[2]);
-	glColor3f(0, 1, 0);	glVertex2i( g_vecPos[1], -g_vecPos[2]);
-	glColor3f(0, 0, 1);	glVertex2i( g_vecPos[1],  g_vecPos[2]);
-	glColor3f(1, 1, 0);	glVertex2i(-g_vecPos[1],  g_vecPos[2]);
-	glEnd ();
-
-	//
-	///////
 
 	// In double buffer mode the last two lines should always be
 	glFlush ();

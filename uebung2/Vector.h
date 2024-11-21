@@ -11,6 +11,7 @@
 #pragma once
 
 #include <iostream>
+#include <math.h>
 
 template<class T, unsigned n> class CMatrix;		// forward declaration of n x n matrix
 

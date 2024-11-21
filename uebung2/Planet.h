@@ -12,6 +12,7 @@
 
 #include "Vector.h"
 #include "Color.h"
+#include "Matrix.h"
 
 class Planet {
 private:
@@ -30,8 +31,9 @@ public:
 	// setter
 	void setColor   (const Color&  c) { color    = c; }
 	void setRadius  (int           r) { radius   = std::max(1, r); }
-	void setPosition(const CVec2f& p) { position = p; }
-
+	
+	void setPosition(const CVec2f& p) { this->position = p; }
+	
 	// draw
 	void draw() const; // Implement in this method your Bresenham algorithm for circles 
 
