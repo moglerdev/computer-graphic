@@ -155,8 +155,8 @@ void timer (int value)
 void displayExercise3(void)
 {
 	affineRotateAroundOrigin(earth, 0.02f * factor);
-	affineRotateAroundPoint(earth.getPosition(), moon, 0.02f * factor);
-	affineRotateAroundPoint(moon.getPosition(), comet, 0.02f * factor);
+	affineRotateAroundPoint(earth.getPosition(), moon, 0.04f * factor);
+	affineRotateAroundPoint(moon.getPosition(), comet, 0.08f * factor);
 
 	glClear (GL_COLOR_BUFFER_BIT);
 
