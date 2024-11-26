@@ -155,8 +155,8 @@ void timer (int value)
 void displayExercise3(void)
 {
 	affineRotateAroundOrigin(earth, 0.02f * factor);
-	affineRotateAroundPoint(earth.getPosition(), moon, 0.05f * factor);
-	affineRotateAroundPoint(moon.getPosition(), comet, 0.1f * factor);
+	affineRotateAroundPoint(earth.getPosition(), moon, 0.02f * factor);
+	affineRotateAroundPoint(moon.getPosition(), comet, 0.02f * factor);
 
 	glClear (GL_COLOR_BUFFER_BIT);
 
@@ -175,16 +175,12 @@ void displayExercise3(void)
 void displayExercise4(void)
 {
 	// Perform Earth's rotation
-	//CMat3f earthRotation = homogenousRotateAroundOrigin(earth, 0.02f * factor);
-	//CMat3f em = trans2dMat(-earth.getPosition());
+	homogenousRotateAroundOrigin(earth, 0.02f * factor);
 
 	// Apply the rotation to the Moon around Earth
 	homogenousRotateAroundPlanet(earth, moon, 0.02f * factor);
+	homogenousRotateAroundPlanet(moon, comet, 0.02f * factor);
 
-	// CMat3f em = affineInverse(trans2dMat(earth.getPosition()));
-	// CMat3f m = homogenousRotateAroundOrigin(earth, 0.02f * factor);
-	//rotateHomogenous2dMat(0.02f * factor);
-	// homogenousRotateAroundPoin (em * m, moon, 0.02f * factor);
 	std::cout << moon.getPosition()[0] << "::" << moon.getPosition()[1] << std::endl;
 
 	glClear (GL_COLOR_BUFFER_BIT);
@@ -192,6 +188,7 @@ void displayExercise4(void)
 	sun.draw();
 	earth.draw();
 	moon.draw();
+	comet.draw();
 
 	// In double buffer mode the last two lines should always be
 	glFlush ();
@@ -206,11 +203,9 @@ void keyboard (unsigned char key, int x, int y)
 			exit (0); // quit program
 			break;
 		case '1':
-			setPlanetsCoords();
 			glutDisplayFunc (displayExercise3);
 			break;
 		case '2':
-			setPlanetsCoords();
 			glutDisplayFunc (displayExercise4);
 			break;
 		case '+':
@@ -220,6 +215,7 @@ void keyboard (unsigned char key, int x, int y)
 			factor -= 0.5f;
 			break;
 		case ' ':
+			setPlanetsCoords();
 			factor = 1.0f;
 			break;
 		default:

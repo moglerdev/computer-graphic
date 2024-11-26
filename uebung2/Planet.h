@@ -47,6 +47,13 @@ public:
 	void setStaticPosition(const CVec2f& p) {
 		this->position = p;
 	}
+
+	void setPose(const CMat3f& pose) {
+		if (this->child != nullptr) {
+			child->setPose(pose);
+		} 
+		this->position = pose * CVec3f(this->position, 1);
+	}
 	
 	// draw
 	void draw() const; // Implement in this method your Bresenham algorithm for circles 

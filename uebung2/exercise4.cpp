@@ -1,38 +1,37 @@
 #include "exercise4.h"
 
-
-CMat3f rotateHomogenous2dMat(const float theta) {
-	CMat3f m;
-	m.setRow(CVec3f(cos(theta), -sin(theta), 0), 0);
-	m.setRow(CVec3f(sin(theta), cos(theta), 0), 1);
-	m.setRow(CVec3f(0 , 0, 1), 2);
-	return m;
-}
-
-CMat3f trans2dMat(const CVec2f& position) {
+CMat3f translate(const float tx, const float ty) {
     CMat3f m;
-    m.setRow(CVec3f(1, 0, position[0]), 0);
-    m.setRow(CVec3f(0, 1, position[1]), 1);
-    m.setRow(CVec3f(0, 0, 1), 2);
+    m.setRow(CVec3f(1.f, 0.f, tx), 0);
+    m.setRow(CVec3f(0.f, 1.f, ty), 1);
+    m.setRow(CVec3f(0.f, 0.f, 1.f), 2);
     return m;
 }
 
+CMat3f translate(const CVec2f& position) {
+    return translate(position[0], position[1]);
+}
 
-CMat3f homogenousRotateAroundOrigin(Planet& planet, const float theta) {
-    CMat3f m = rotateHomogenous2dMat(theta);
-    CVec3f prevPos = CVec3f(planet.getPosition(), 1);
-    CVec3f newPos = m * prevPos;
-    planet.setStaticPosition(newPos);
+CMat3f rotate(float theta) {
+    float c = cos(theta), s = sin(theta);
+    CMat3f m;
+    m.setRow(CVec3f(c, -s, 0), 0);
+    m.setRow(CVec3f(s,  c, 0), 1);
+    m.setRow(CVec3f(0,  0, 1), 2);
     return m;
 }
 
-CVec3f po = CVec3f(290, 0, 1);
-float x = 0;
+CMat3f rotateAroundPoint(const float theta, const CVec2f position) {
+    return translate(position) * rotate(theta) * translate(-position);
+}
+
+void homogenousRotateAroundOrigin(Planet& planet, const float theta) {
+    CMat3f m = rotate(theta);
+    planet.setPose(m);
+}
+
 void homogenousRotateAroundPlanet(const Planet& toOrbit, Planet& planet, const float theta) {
-    x += theta;
-    CMat3f pose = trans2dMat(-toOrbit.getPosition());
-    CMat3f pose2 = trans2dMat(toOrbit.getPosition());
-    CMat3f rot = homogenousRotateAroundOrigin(planet, x);
-    CVec3f loc = pose2 * rot * pose * po;
-    planet.setStaticPosition(loc);
+    CVec2f tO = toOrbit.getPosition();
+    CMat3f transform = rotateAroundPoint(theta, tO);
+    planet.setPose(transform);
 }
