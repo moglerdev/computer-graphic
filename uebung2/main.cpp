@@ -174,10 +174,17 @@ void displayExercise3(void)
 // display callback function for EXERCISE 4
 void displayExercise4(void)
 {
-	CMat3f m = homogenousRotateAroundOrigin(earth, 0.02f * factor);
+	// Perform Earth's rotation
+	//CMat3f earthRotation = homogenousRotateAroundOrigin(earth, 0.02f * factor);
+	//CMat3f em = trans2dMat(-earth.getPosition());
+
+	// Apply the rotation to the Moon around Earth
+	homogenousRotateAroundPlanet(earth, moon, 0.02f * factor);
+
+	// CMat3f em = affineInverse(trans2dMat(earth.getPosition()));
+	// CMat3f m = homogenousRotateAroundOrigin(earth, 0.02f * factor);
 	//rotateHomogenous2dMat(0.02f * factor);
-	CMat3f em = affineInverse(trans2dMat(earth.getPosition()));
-	homogenousRotateAroundPoint(em, moon);
+	// homogenousRotateAroundPoin (em * m, moon, 0.02f * factor);
 	std::cout << moon.getPosition()[0] << "::" << moon.getPosition()[1] << std::endl;
 
 	glClear (GL_COLOR_BUFFER_BIT);

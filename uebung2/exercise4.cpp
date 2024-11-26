@@ -18,7 +18,7 @@ CMat3f trans2dMat(const CVec2f& position) {
 }
 
 
-CMat3f homogenousRotateAroundOrigin(Planet& planet, float theta) {
+CMat3f homogenousRotateAroundOrigin(Planet& planet, const float theta) {
     CMat3f m = rotateHomogenous2dMat(theta);
     CVec3f prevPos = CVec3f(planet.getPosition(), 1);
     CVec3f newPos = m * prevPos;
@@ -26,7 +26,13 @@ CMat3f homogenousRotateAroundOrigin(Planet& planet, float theta) {
     return m;
 }
 
-void homogenousRotateAroundPoint(const CMat3f& pose, Planet& planet) {
-    auto p = pose * CVec3f(planet.getPosition(), 1);
-    planet.setStaticPosition(p);
+CVec3f po = CVec3f(290, 0, 1);
+float x = 0;
+void homogenousRotateAroundPlanet(const Planet& toOrbit, Planet& planet, const float theta) {
+    x += theta;
+    CMat3f pose = trans2dMat(-toOrbit.getPosition());
+    CMat3f pose2 = trans2dMat(toOrbit.getPosition());
+    CMat3f rot = homogenousRotateAroundOrigin(planet, x);
+    CVec3f loc = pose2 * rot * pose * po;
+    planet.setStaticPosition(loc);
 }
