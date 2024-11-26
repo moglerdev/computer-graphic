@@ -14,6 +14,7 @@
 
 #include "Planet.h"
 #include "exercise3.h"
+#include "exercise4.h"
 
 ////////////////////////////////////////////////////////////
 //
@@ -49,20 +50,29 @@ CVec2i g_vecPosIncr;	// (used in display2)
 //
 /////////////////////////////////////////////////////////////
 
+#define SUN_POS CVec2f(0, 0)
+#define EARTH_POS CVec2f(200, 0)
+#define MOON_POS CVec2f(290, 0)
+#define COMET_POS CVec2f(320, 0)
+
+
+void setPlanetsCoords() {
+	sun.setPosition(SUN_POS);
+	earth.setPosition(EARTH_POS);
+	moon.setPosition(MOON_POS);
+	comet.setPosition(COMET_POS);
+
+}
 
 // Function to initialize our own variables
 void init () 
 {
 	sun.setColor(Yellow);
-	earth.setColor(Green);
+	earth.setColor(Red);
 	moon.setColor(Blue);
 	comet.setColor(Cyan);
 
-	sun.setPosition(CVec2f(0, 0));
-	earth.setPosition(CVec2f(200, 0));
-	moon.setPosition(CVec2f(290, 0));
-	comet.setPosition(CVec2f(320, 0));
-
+	setPlanetsCoords();
 
 	sun.setRadius(80);
 	earth.setRadius(40);
@@ -164,9 +174,17 @@ void displayExercise3(void)
 // display callback function for EXERCISE 4
 void displayExercise4(void)
 {
+	CMat3f m = homogenousRotateAroundOrigin(earth, 0.02f * factor);
+	//rotateHomogenous2dMat(0.02f * factor);
+	CMat3f em = affineInverse(trans2dMat(earth.getPosition()));
+	homogenousRotateAroundPoint(em, moon);
+	std::cout << moon.getPosition()[0] << "::" << moon.getPosition()[1] << std::endl;
+
 	glClear (GL_COLOR_BUFFER_BIT);
 
-
+	sun.draw();
+	earth.draw();
+	moon.draw();
 
 	// In double buffer mode the last two lines should always be
 	glFlush ();
@@ -181,16 +199,18 @@ void keyboard (unsigned char key, int x, int y)
 			exit (0); // quit program
 			break;
 		case '1':
+			setPlanetsCoords();
 			glutDisplayFunc (displayExercise3);
 			break;
 		case '2':
+			setPlanetsCoords();
 			glutDisplayFunc (displayExercise4);
 			break;
 		case '+':
-			factor += 0.05f;
+			factor += 0.5f;
 			break;
 		case '-':
-			factor -= 0.05f;
+			factor -= 0.5f;
 			break;
 		case ' ':
 			factor = 1.0f;
@@ -215,7 +235,7 @@ int main (int argc, char **argv)
 
 	glutTimerFunc(10, timer, 0);
 	glutReshapeFunc (reshape);			// is triggered on window size changes
-	glutDisplayFunc (displayExercise3);	// is triggered to redraw the viewport/display
+	glutDisplayFunc (displayExercise4);	// is triggered to redraw the viewport/display
 	glutKeyboardFunc(keyboard);			// is triggered on keyboard events
 
 	// start main loop

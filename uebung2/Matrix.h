@@ -135,3 +135,5 @@ typedef CMatrix<double, 3> CMat3d;
 typedef CMatrix<double, 4> CMat4d;
 
 CMat4d affineInverse(const CMat4d& M);	// inverse of AFFINE MAP only!!!
+CMat4f affineInverse(const CMat4f& M);	// inverse of AFFINE MAP only!!!
+CMat3f affineInverse(const CMat3f& M);	// inverse of AFFINE MAP only!!!
