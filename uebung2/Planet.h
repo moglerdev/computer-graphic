@@ -40,7 +40,7 @@ public:
 		if (this->child != nullptr) {
 			CVec2f cp = child->getPosition() - this->position;
 			child->setPosition(cp + p);
-		} 
+		}
 		this->position = p;
 	}
 

@@ -70,7 +70,7 @@ void init ()
 	sun.setColor(Yellow);
 	earth.setColor(Red);
 	moon.setColor(Blue);
-	comet.setColor(Cyan);
+	comet.setColor(Color(0,0,0));
 
 	setPlanetsCoords();
 
@@ -124,7 +124,7 @@ void reshape(int w, int h)
 	glutPostRedisplay();
 }
 
-float factor = 1.0f;
+float factor = .5f;
 // timer callback function
 void timer (int value) 
 {
@@ -178,10 +178,8 @@ void displayExercise4(void)
 	homogenousRotateAroundOrigin(earth, 0.02f * factor);
 
 	// Apply the rotation to the Moon around Earth
-	homogenousRotateAroundPlanet(earth, moon, 0.02f * factor);
 	homogenousRotateAroundPlanet(moon, comet, 0.02f * factor);
-
-	std::cout << moon.getPosition()[0] << "::" << moon.getPosition()[1] << std::endl;
+	homogenousRotateAroundPlanet(earth, moon, 0.02f * factor);
 
 	glClear (GL_COLOR_BUFFER_BIT);
 
@@ -203,16 +201,18 @@ void keyboard (unsigned char key, int x, int y)
 			exit (0); // quit program
 			break;
 		case '1':
+			std::cout << "Exercise 3" << std::endl;
 			glutDisplayFunc (displayExercise3);
 			break;
 		case '2':
+			std::cout << "Exercise 4" << std::endl;
 			glutDisplayFunc (displayExercise4);
 			break;
 		case '+':
-			factor += 0.5f;
+			factor += 0.1f;
 			break;
 		case '-':
-			factor -= 0.5f;
+			factor -= 0.1f;
 			break;
 		case ' ':
 			setPlanetsCoords();
@@ -238,7 +238,7 @@ int main (int argc, char **argv)
 
 	glutTimerFunc(10, timer, 0);
 	glutReshapeFunc (reshape);			// is triggered on window size changes
-	glutDisplayFunc (displayExercise4);	// is triggered to redraw the viewport/display
+	glutDisplayFunc (displayExercise3);	// is triggered to redraw the viewport/display
 	glutKeyboardFunc(keyboard);			// is triggered on keyboard events
 
 	// start main loop
