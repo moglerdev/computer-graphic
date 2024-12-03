@@ -12,7 +12,7 @@ WIN_INCLUDE = -I"..\freeglut\include"
 # Source and output files
 SRCS = $(wildcard *.cpp *.c)
 OBJS = $(SRCS:.cpp=.o)
-TARGET = uebung2.bin
+TARGET = uebung4.bin
 # Static linking specific flags (ensure we don't link dynamically)
 LDFLAGS = -static
 
@@ -20,7 +20,7 @@ LDFLAGS = -static
 ifeq ($(OS),Windows_NT)
     CXXFLAGS += $(WIN_INCLUDE)
     LIBS = $(WIN_LIBS)
-	TARGET = uebung2.exe
+	TARGET = uebung4.exe
 endif
 
 # Rules
@@ -42,3 +42,6 @@ endif
 
 clean:
 	$(DEL) $(OBJS) $(TARGET)
+
+run: $(TARGET)
+	./$(TARGET)
