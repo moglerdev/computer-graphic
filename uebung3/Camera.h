@@ -20,6 +20,8 @@ class Camera {
         void setPose(CMat4f pose) {
             viewDir = pose * viewDir;
             viewUp = pose * viewUp;
+            viewDir.normalize();
+            viewUp.normalize();
         }
 
     public:

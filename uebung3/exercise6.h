@@ -11,8 +11,6 @@
  */
 CMat4f getTransform(CVec4f ViewOrigin, CVec4f ViewDir, CVec4f ViewUp);
 
-CMat4f getInverseTransform(CVec4f ViewOrigin, CVec4f ViewDir, CVec4f ViewUp);
-
 /**
  * that transforms the point pWorld in world coordinates via matTransf to view-coordinates and 
 *  projects it onto the image plane using projectZ. 

@@ -9,9 +9,9 @@
  * @param ViewUp a general view-up-vector ViewUp (in homogenous world- coordinates)
  */
 CMat4f getTransform(CVec4f ViewOrigin, CVec4f ViewDir, CVec4f ViewUp) {
-    CVec4f z = ViewDir.normalized();
-    CVec4f y = ViewUp.normalized();
-    CVec4f x = y.crossH(z).normalized();
+    CVec4f z = ViewDir;
+    CVec4f y = ViewUp;
+    CVec4f x = y.crossH(z);
     CVec4f t = ViewOrigin;
 
     CMat4f matTransf;
@@ -24,13 +24,7 @@ CMat4f getTransform(CVec4f ViewOrigin, CVec4f ViewDir, CVec4f ViewUp) {
 }
 
 CMat4f getInverseTransform(CVec4f ViewOrigin, CVec4f ViewDir, CVec4f ViewUp) {
-    CMat4f inverse;
-    CMat4f matTransf = getTransform(ViewOrigin, ViewDir, ViewUp);
-    CVec3f t = {matTransf.getRow(0)[3], matTransf.getRow(1)[3], matTransf.getRow(2)[3]};
-    CMat3f R;
-    R.setRow(matTransf.getRow(0).getSubVector(), 0);
-    R.setRow(matTransf.getRow(1).getSubVector(), 1);
-    R.setRow(matTransf.getRow(2).getSubVector(), 2);
+    return affineInverse(getTransform(ViewOrigin, ViewDir, ViewUp));
 }
 
 /**
@@ -39,8 +33,7 @@ CMat4f getInverseTransform(CVec4f ViewOrigin, CVec4f ViewDir, CVec4f ViewUp) {
  */
 CVec4f projectZ(CMat4f matTransf, float fFocus, CVec4f pWorld) {
     CVec4f pView = matTransf * pWorld;
-    CVec4f pProj = projectZ(fFocus, pView);
-    return pProj;
+    return projectZ(fFocus, pView);
 }
 
 
