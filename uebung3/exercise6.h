@@ -17,7 +17,7 @@ CMat4f getInverseTransform(CVec4f ViewOrigin, CVec4f ViewDir, CVec4f ViewUp);
  * that transforms the point pWorld in world coordinates via matTransf to view-coordinates and 
 *  projects it onto the image plane using projectZ. 
  */
-CVec4f projectZallg(CMat4f matTransf, float fFocus, CVec4f pWorld);
+CVec4f projectZ(CMat4f matTransf, float fFocus, CVec4f pWorld);
 
 
 void drawCuboid(CMat4f matTransf, CVec3f Cuboid[8], float fFocus, Color c);
