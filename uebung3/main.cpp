@@ -12,7 +12,9 @@
 // Include-File for GLUT-Library
 #include <GL/glut.h>
 
+#include "Cube.h"
 #include "bresenham.h"
+#include "vector"
 
 ////////////////////////////////////////////////////////////
 //
@@ -20,8 +22,8 @@
 //
 
 // resolution of the of the main window (can be changed by the user)
-int g_WinWidth  = 800;
-int g_WinHeight = 800;
+int g_WinWidth  = 600;
+int g_WinHeight = 600;
 
 // global variable to tune the timer interval
 int g_iTimerMSecs;
@@ -39,12 +41,18 @@ float g_iPosIncr;		// ... position increment (used in display1)
 
 CVec2i g_vecPos;		// same as above but in vector form ...
 CVec2i g_vecPosIncr;	// (used in display2)
+std::vector<Cube> g_cubes;
+
 //
 /////////////////////////////////////////////////////////////
 
 // Function to initialize our own variables
 void init () 
 {
+	g_cubes.push_back(Cube(CVec3f(150, 0, 10), 50, Color(1, 0, 0)));
+	g_cubes.push_back(Cube(CVec3f(-150, 0, 20), 50, Color(0, 1, 0)));
+	g_cubes.push_back(Cube(CVec3f(0, 150, 30), 50, Color(0, 0, 1)));
+
 	// init timer interval
 	g_iTimerMSecs = 10;
 
@@ -71,7 +79,7 @@ void initGL ()
 			 -g_WinHeight /2, g_WinHeight /2, 0, 1);	
 	glDrawBuffer (GL_BACK);							// Tell GL that we draw to the back buffer and swap ...
 													// ... buffers when image is ready to avoid flickering	
-	float b = 70.0f / 100.0f;
+	float b = 0;//70.0f / 100.0f;
 	glClearColor(b, b, b, 1.0f);					// Tell which color to use to clear image
 }
 
@@ -116,12 +124,16 @@ void timer (int value)
 	glutTimerFunc (g_iTimerMSecs, timer, 0);	// call timer for next iteration
 }
 
+float fFocus = 200;
+
 // display callback function for EXERCISE 4
 void display(void)
 {
-	glClear (GL_COLOR_BUFFER_BIT);
+	glClear (GL_COLOR_BUFFER_BIT);	// clear the color buffer
 
-
+	for(auto& cube : g_cubes) {
+		cube.render(fFocus);
+	}
 
 	// In double buffer mode the last two lines should always be
 	glFlush ();
@@ -147,7 +159,7 @@ int main (int argc, char **argv)
 {
 	glutInit (&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);
-	glutCreateWindow("Computer graphics assignment 2: 2d-Rotations (WS24/25)");
+	glutCreateWindow("Computer graphics assignment 3: 3d Projection (WS24/25)");
 	glutReshapeWindow(g_WinWidth, g_WinHeight);
 
 	init  ();	// init my variables first
