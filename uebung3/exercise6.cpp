@@ -27,15 +27,27 @@ CMat4f getInverseTransform(CVec4f ViewOrigin, CVec4f ViewDir, CVec4f ViewUp) {
     CMat4f inverse;
     CMat4f matTransf = getTransform(ViewOrigin, ViewDir, ViewUp);
     CVec3f t = {matTransf.getRow(0)[3], matTransf.getRow(1)[3], matTransf.getRow(2)[3]};
-    CMat3f R = {matTransf.getRow(0).getSubVector(), matTransf.getRow(1).getSubVector(), matTransf.getRow(2).getSubVector()};
+    CMat3f R;
+    R.setRow(matTransf.getRow(0).getSubVector(), 0);
+    R.setRow(matTransf.getRow(1).getSubVector(), 1);
+    R.setRow(matTransf.getRow(2).getSubVector(), 2);
 }
 
 /**
  * that transforms the point pWorld in world coordinates via matTransf to view-coordinates and 
 *  projects it onto the image plane using projectZ. 
  */
-CVec4f projectZallg(CMat4f matTransf, float fFocus, CVec4f pWorld) {
+CVec4f projectZ(CMat4f matTransf, float fFocus, CVec4f pWorld) {
     CVec4f pView = matTransf * pWorld;
     CVec4f pProj = projectZ(fFocus, pView);
     return pProj;
+}
+
+
+void drawCuboid(CMat4f matTransf, CVec3f Cuboid[8], float fFocus, Color c) {
+    CVec3f pPoint[8];
+    for(int i = 0; i < 8; ++i) {
+        pPoint[i] = projectZ(matTransf, fFocus, CVec4f(Cuboid[i], 1));
+    }
+    drawProjectedZ(pPoint, c);
 }

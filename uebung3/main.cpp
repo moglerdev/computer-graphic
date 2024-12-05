@@ -8,14 +8,16 @@
 #include "Matrix.h"
 
 #include <iostream>
+#include <vector>
 
 // Include-File for GLUT-Library
 #include <GL/glut.h>
 
+#include "bresenham.h"
 #include "Cube.h"
 #include "exercise6.h"
-#include "bresenham.h"
-#include "vector"
+#include "exercise7.h"
+#include "Camera.h"
 
 ////////////////////////////////////////////////////////////
 //
@@ -43,10 +45,7 @@ float g_iPosIncr;		// ... position increment (used in display1)
 CVec2i g_vecPos;		// same as above but in vector form ...
 CVec2i g_vecPosIncr;	// (used in display2)
 
-float g_fFocus;
-std::vector<Cube>* g_cubes = nullptr;
-
-CVec4f g_viewOrigin, g_viewDir, g_viewUp;
+Camera g_camera(CVec3f(0, 0, -100), 100);
 
 //
 /////////////////////////////////////////////////////////////
@@ -54,20 +53,14 @@ CVec4f g_viewOrigin, g_viewDir, g_viewUp;
 // Function to initialize our own variables
 void init () 
 {
-	if (g_cubes != nullptr) {
-		delete g_cubes;
-	}
-	g_cubes = new std::vector<Cube>();
-	g_cubes->push_back(Cube(CVec3f(150, 0, 10), 50, Color(1, 0, 0)));
-	g_cubes->push_back(Cube(CVec3f(-150, 0, 20), 50, Color(0, 1, 0)));
-	g_cubes->push_back(Cube(CVec3f(0, 150, 30), 50, Color(0, 0, 1)));
+	std::vector<Cube*> actors;
+	actors.push_back(new Cube(CVec3f(150, 0, 10), 50, Color(1, 0, 0)));
+	actors.push_back(new Cube(CVec3f(-150, 0, 20), 50, Color(0, 1, 0)));
+	actors.push_back(new Cube(CVec3f(0, 150, 30), 50, Color(0, 0, 1)));
 
-	g_fFocus = 200;
-
-	g_viewDir = CVec4f({0, 0, -1, 0});
-	g_viewOrigin = CVec4f({0, 0, 0, 1});
-	g_viewUp = CVec4f({0, 1, 0, 0});
-
+	g_camera = Camera(CVec3f(0, 0, -100), 100);
+	g_camera.setCubes(actors);
+	
 	// init timer interval
 	g_iTimerMSecs = 10;
 
@@ -140,14 +133,23 @@ void timer (int value)
 }
 
 // display callback function for EXERCISE 4
-void display(void)
+void display5(void)
+{
+	glClear (GL_COLOR_BUFFER_BIT);	// clear the color buffer
+	
+	g_camera.render();
+
+	// In double buffer mode the last two lines should always be
+	glFlush ();
+	glutSwapBuffers (); // swap front and back buffer
+}
+
+// display callback function for EXERCISE 4
+void display6(void)
 {
 	glClear (GL_COLOR_BUFFER_BIT);	// clear the color buffer
 
-	
-	for(auto& cube : *g_cubes) {
-		cube.render(g_fFocus);
-	}
+	g_camera.render();
 
 	// In double buffer mode the last two lines should always be
 	glFlush ();
@@ -156,52 +158,17 @@ void display(void)
 
 void keyboard (unsigned char key, int x, int y) 
 {
+	g_camera.handleKey(key);
 	switch (key) {
+		// case '5':
+		// 	glutDisplayFunc (display5);
+		// 	break;
+		// case '6':
+		// 	glutDisplayFunc (display6);
+		// 	break;
 		case 'q':
 		case 'Q':
 			exit (0); // quit program
-			break;
-		case 'F':
-			g_fFocus += 10;
-			break;
-		case 'f':
-			g_fFocus -= 10;
-			break;
-		case 'X':
-			break;
-		case 'x':
-			break;
-		case 'Y':
-			break;
-		case 'y':
-			break;
-		case 'Z':
-			break;
-		case 'z':
-			break;
-		case 'A':
-			break;
-		case 'a':
-			break;
-		case 'B':
-			break;
-		case 'b':
-			break;	
-		case 'C':
-			break;
-		case 'c':
-			break;
-		case 'U':
-			break;
-		case 'u':
-			break;
-		case 'V':
-			break;
-		case 'v':
-			break;
-		case 'W':
-			break;
-		case 'w':
 			break;
 		case 'R':
 		case 'r':
@@ -227,7 +194,7 @@ int main (int argc, char **argv)
 
 	glutTimerFunc(10, timer, 0);
 	glutReshapeFunc (reshape);			// is triggered on window size changes
-	glutDisplayFunc (display);	// is triggered to redraw the viewport/display
+	glutDisplayFunc (display6);	// is triggered to redraw the viewport/display
 	glutKeyboardFunc(keyboard);			// is triggered on keyboard events
 
 	// start main loop

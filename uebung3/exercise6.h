@@ -3,6 +3,7 @@
 
 #include "Matrix.h"
 #include "Vector.h"
+#include "Color.h"
 
 /**
  * that computes the 4x4- transformation-matrix to converts view-coordinates to world-coordinates, 
@@ -18,4 +19,6 @@ CMat4f getInverseTransform(CVec4f ViewOrigin, CVec4f ViewDir, CVec4f ViewUp);
  */
 CVec4f projectZallg(CMat4f matTransf, float fFocus, CVec4f pWorld);
 
+
+void drawCuboid(CMat4f matTransf, CVec3f Cuboid[8], float fFocus, Color c);
 #endif // EXERCISE6_H
