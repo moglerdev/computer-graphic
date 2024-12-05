@@ -11,13 +11,16 @@ class Cube {
         CVec3f position;
         float size;
         float thetaX;
-        void adjustCube();
 
     public: 
         Cube(CVec3f _center, float _size, Color _c);
-        void rotateX(float theta);
-        void setPos(CVec3f pos);
-        void render(float fFocus);
+        void setPos(CVec3f pos) {
+            this->position = pos;
+        }
+        void setRotateX(float theta) {
+            this->thetaX = theta;
+        }
+        void render(CMat4f transform, float fFocus);
 };
 
 #endif // CUBE_H

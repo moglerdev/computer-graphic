@@ -13,6 +13,7 @@
 #include <GL/glut.h>
 
 #include "Cube.h"
+#include "exercise6.h"
 #include "bresenham.h"
 #include "vector"
 
@@ -41,7 +42,11 @@ float g_iPosIncr;		// ... position increment (used in display1)
 
 CVec2i g_vecPos;		// same as above but in vector form ...
 CVec2i g_vecPosIncr;	// (used in display2)
-std::vector<Cube> g_cubes;
+
+float g_fFocus;
+std::vector<Cube>* g_cubes = nullptr;
+
+CVec4f g_viewOrigin, g_viewDir, g_viewUp;
 
 //
 /////////////////////////////////////////////////////////////
@@ -49,9 +54,19 @@ std::vector<Cube> g_cubes;
 // Function to initialize our own variables
 void init () 
 {
-	g_cubes.push_back(Cube(CVec3f(150, 0, 10), 50, Color(1, 0, 0)));
-	g_cubes.push_back(Cube(CVec3f(-150, 0, 20), 50, Color(0, 1, 0)));
-	g_cubes.push_back(Cube(CVec3f(0, 150, 30), 50, Color(0, 0, 1)));
+	if (g_cubes != nullptr) {
+		delete g_cubes;
+	}
+	g_cubes = new std::vector<Cube>();
+	g_cubes->push_back(Cube(CVec3f(150, 0, 10), 50, Color(1, 0, 0)));
+	g_cubes->push_back(Cube(CVec3f(-150, 0, 20), 50, Color(0, 1, 0)));
+	g_cubes->push_back(Cube(CVec3f(0, 150, 30), 50, Color(0, 0, 1)));
+
+	g_fFocus = 200;
+
+	g_viewDir = CVec4f({0, 0, -1, 0});
+	g_viewOrigin = CVec4f({0, 0, 0, 1});
+	g_viewUp = CVec4f({0, 1, 0, 0});
 
 	// init timer interval
 	g_iTimerMSecs = 10;
@@ -124,15 +139,14 @@ void timer (int value)
 	glutTimerFunc (g_iTimerMSecs, timer, 0);	// call timer for next iteration
 }
 
-float fFocus = 200;
-
 // display callback function for EXERCISE 4
 void display(void)
 {
 	glClear (GL_COLOR_BUFFER_BIT);	// clear the color buffer
 
-	for(auto& cube : g_cubes) {
-		cube.render(fFocus);
+	
+	for(auto& cube : *g_cubes) {
+		cube.render(g_fFocus);
 	}
 
 	// In double buffer mode the last two lines should always be
@@ -146,6 +160,52 @@ void keyboard (unsigned char key, int x, int y)
 		case 'q':
 		case 'Q':
 			exit (0); // quit program
+			break;
+		case 'F':
+			g_fFocus += 10;
+			break;
+		case 'f':
+			g_fFocus -= 10;
+			break;
+		case 'X':
+			break;
+		case 'x':
+			break;
+		case 'Y':
+			break;
+		case 'y':
+			break;
+		case 'Z':
+			break;
+		case 'z':
+			break;
+		case 'A':
+			break;
+		case 'a':
+			break;
+		case 'B':
+			break;
+		case 'b':
+			break;	
+		case 'C':
+			break;
+		case 'c':
+			break;
+		case 'U':
+			break;
+		case 'u':
+			break;
+		case 'V':
+			break;
+		case 'v':
+			break;
+		case 'W':
+			break;
+		case 'w':
+			break;
+		case 'R':
+		case 'r':
+			init();
 			break;
 		default:
 			// do nothing ...

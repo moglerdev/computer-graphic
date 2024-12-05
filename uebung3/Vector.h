@@ -12,6 +12,7 @@
 
 #include <iostream>
 #include <math.h>
+#include <initializer_list>
 
 template<class T, unsigned n> class CMatrix;		// forward declaration of n x n matrix
 
@@ -36,6 +37,12 @@ public:
 	CVector<T, n> (const T atData[n])							
 	{
 		for (int i=0; i<n; i++) m_atData[i] = atData[i];		
+	}
+
+	// constructor from data array
+	CVector<T, n> (const std::initializer_list<T> atData)							
+	{
+		for(int i = 0; i < n; i++) m_atData[i] = *(atData.begin() + i);		
 	}
 
 	// copy constructor
@@ -75,6 +82,13 @@ public:
 	unsigned getDimension () 
 	{
 		return n;
+	}
+
+	CVector<T, n-1> getSubVector () const
+	{
+		T atData[n-1];
+		for (int i=0; i<n-1; i++) atData[i] = m_atData[i];
+		return CVector<T, n-1>(atData);
 	}
 
 	// copy assignment operator
