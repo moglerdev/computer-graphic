@@ -9,7 +9,7 @@
  * @param ViewUp a general view-up-vector ViewUp (in homogenous world- coordinates)
  */
 CMat4f getTransform(CVec4f ViewOrigin, CVec4f ViewDir, CVec4f ViewUp) {
-    CVec4f z = ViewDir;
+    CVec4f z = -ViewDir;
     CVec4f y = ViewUp;
     CVec4f x = y.crossH(z);
     CVec4f t = ViewOrigin;

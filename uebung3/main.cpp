@@ -58,7 +58,7 @@ void init ()
 	actors.push_back(new Cube(CVec3f(-150, 0, 20), 50, Color(0, 1, 0)));
 	actors.push_back(new Cube(CVec3f(0, 150, 30), 50, Color(0, 0, 1)));
 
-	g_camera = Camera(CVec3f(0, 0, -100), 100);
+	g_camera = Camera(CVec3f(-100, 50, -100), 50);
 	g_camera.setCubes(actors);
 	
 	// init timer interval

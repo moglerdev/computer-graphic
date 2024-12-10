@@ -2,11 +2,11 @@
 #define CAMERA_H
 
 #include <vector>
+#include <iostream>
 #include "Cube.h"
 
 #include "Vector.h"
 #include "Matrix.h"
-
 
 class Camera {
     private: 
@@ -17,11 +17,10 @@ class Camera {
 
         std::vector<Cube*> cubes;
 
-        void setPose(CMat4f pose) {
-            viewDir = pose * viewDir;
-            viewUp = pose * viewUp;
-            viewDir.normalize();
-            viewUp.normalize();
+        void setPose(CMat4f mat) {
+            viewOrigin = mat * viewOrigin;
+            viewDir = mat * viewDir;
+            viewUp = mat * viewUp;
         }
 
     public:
@@ -29,8 +28,8 @@ class Camera {
          : fFocus(focus) {
             viewOrigin = CVec4f(position, 1);
 
-            viewDir = CVec4f({0, 0, 1, 0});
-            viewUp = CVec4f({0, 1, 0, 0});
+            viewDir = CVec4f({0, 1, 0, 0});
+            viewUp = CVec4f({1, 0, 0, 0});
         }
 
         void addCube(Cube* cube) {

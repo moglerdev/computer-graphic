@@ -17,32 +17,33 @@ void Camera::render() {
 }
 
 void Camera::rotateWorldX(float theta) {
-    setPose(rotateMatrixX(theta));
+	CMat4f mat = translation(viewOrigin) * rotateMatrixX(theta) * translation(-viewOrigin);
+	setPose(mat);
 }
 void Camera::rotateWorldY(float theta) {
-    setPose(rotateMatrixY(theta));
+	CMat4f mat = translation(viewOrigin) * rotateMatrixY(theta) * translation(-viewOrigin);
+	setPose(mat);
 }
 void Camera::rotateWorldZ(float theta) {
-    setPose(rotateMatrixZ(theta));
+	CMat4f mat = translation(viewOrigin) * rotateMatrixZ(theta) * translation(-viewOrigin);
+	setPose(mat);
 }
 
 void Camera::rotateLocalX(float theta) {
     // Rotate around the local X-axis (viewRight)
-	CMat4f mat = translation(viewOrigin) * rotateMatrixX(theta) * translation(-viewOrigin);
+	CMat4f mat = rotateMatrixX(theta);
 	setPose(mat);
 }
 
 void Camera::rotateLocalY(float theta) {
     // Rotate around the local Y-axis (viewUp)
-	
-	CMat4f mat = translation(viewOrigin) * rotateMatrixY(theta) * translation(-viewOrigin);
+	CMat4f mat = rotateMatrixY(theta);
 	setPose(mat);
 }
 
 void Camera::rotateLocalZ(float theta) {
     // Rotate around the local Z-axis (viewDir)
-	
-	CMat4f mat = translation(viewOrigin) * rotateMatrixZ(theta) * translation(-viewOrigin);
+	CMat4f mat = rotateMatrixZ(theta);
 	setPose(mat);
 }
 
