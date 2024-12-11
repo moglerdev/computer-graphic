@@ -17,11 +17,7 @@ class Camera {
 
         std::vector<Cube*> cubes;
 
-        void setPose(CMat4f mat) {
-            viewOrigin = mat * viewOrigin;
-            viewDir = mat * viewDir;
-            viewUp = mat * viewUp;
-        }
+        void setPose(CMat4f mat);
 
     public:
         Camera(CVec3f position, float focus)

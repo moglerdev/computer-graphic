@@ -16,6 +16,14 @@ void Camera::render() {
     }
 }
 
+void Camera::setPose(CMat4f mat) {
+	viewOrigin = mat * viewOrigin;
+	viewDir = mat * viewDir;
+	viewUp = mat * viewUp;
+	viewDir.normalize();
+	viewUp.normalize();
+}
+
 void Camera::rotateWorldX(float theta) {
 	CMat4f mat = translation(viewOrigin) * rotateMatrixX(theta) * translation(-viewOrigin);
 	setPose(mat);
