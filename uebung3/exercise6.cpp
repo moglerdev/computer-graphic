@@ -24,6 +24,26 @@ glm::mat4 getTransform(glm::vec4 ViewOrigin, glm::vec4 ViewDir, glm::vec4 ViewUp
     return matTransf;
 }
 
+glm::mat4 getInverseTransform(glm::vec4 ViewOrigin, glm::vec4 ViewDir, glm::vec4 ViewUp) {
+    return glm::inverse(getTransform(ViewOrigin, ViewDir, ViewUp));
+}
+
+glm::vec4 projectZ(glm::mat4 matTransf, float fFocus, glm::vec4 pWorld) {
+    glm::vec4 pView = matTransf * pWorld;
+    return projectZ(fFocus, pView);
+}
+
+void drawCuboid(glm::mat4 matTransf, glm::vec3 Cuboid[8], float fFocus, Color c) {
+    glm::vec3 pPoint[8];
+    for (int i = 0; i < 8; ++i) {
+        glm::vec4 pWorld = glm::vec4(Cuboid[i], 1.0f);
+        glm::vec4 pProjected = projectZ(matTransf, fFocus, pWorld);
+        pPoint[i] = glm::vec3(pProjected);
+    }
+    drawProjectedZ(pPoint, c);
+}
+
+
 // Check if a point is inside the frustum
 bool isPointInFrustum(const glm::vec4& point, const glm::mat4& matProjView) {
     glm::vec4 clipSpace = matProjView * point;
@@ -43,23 +63,4 @@ bool isCuboidInFrustum(const glm::vec3 cuboid[8], const glm::mat4& matProjView) 
         }
     }
     return false; // No points inside, cull the cuboid
-}
-
-glm::mat4 getInverseTransform(glm::vec4 ViewOrigin, glm::vec4 ViewDir, glm::vec4 ViewUp) {
-    return glm::inverse(getTransform(ViewOrigin, ViewDir, ViewUp));
-}
-
-glm::vec4 projectZ(glm::mat4 matTransf, float fFocus, glm::vec4 pWorld) {
-    glm::vec4 pView = matTransf * pWorld;
-    return projectZ(fFocus, pView);
-}
-
-void drawCuboid(glm::mat4 matTransf, glm::vec3 Cuboid[8], float fFocus, Color c) {
-    glm::vec3 pPoint[8];
-    for (int i = 0; i < 8; ++i) {
-        glm::vec4 pWorld = glm::vec4(Cuboid[i], 1.0f);
-        glm::vec4 pProjected = projectZ(matTransf, fFocus, pWorld);
-        pPoint[i] = glm::vec3(pProjected);
-    }
-    drawProjectedZ(pPoint, c);
 }
