@@ -1,9 +1,9 @@
 #include "bresenham.h"
 
 #include <GL/freeglut.h>
-#include "Vector.h"
+#include <glm/vec2.hpp>
 
-void BresenhamLine(CVec2f p1, CVec2f p2, Color c) 
+void BresenhamLine(glm::vec2 p1, glm::vec2 p2, Color c) 
 {
     glBegin(GL_POINTS);
     glColor3f(c.r, c.g, c.b); // Set the line color
@@ -17,8 +17,8 @@ void BresenhamLine(CVec2f p1, CVec2f p2, Color c)
     int err = dx + dy; // Error term
     int e2; // Double the error term
 
-    CVec2i pxI((int)p1[0], (int)p1[1]); // Start point as integers
-    CVec2i p2I((int)p2[0], (int)p2[1]); // End point as integers
+    glm::ivec2 pxI((int)p1[0], (int)p1[1]); // Start point as integers
+    glm::ivec2 p2I((int)p2[0], (int)p2[1]); // End point as integers
 
     while (true) {
         glVertex2i(pxI[0], pxI[1]); // Plot the point
@@ -39,7 +39,7 @@ void BresenhamLine(CVec2f p1, CVec2f p2, Color c)
     glEnd();
 }
 
-void BresenhamCircle (CVec2f p, int r, Color c)
+void BresenhamCircle (glm::vec2 p, int r, Color c)
 {
 	glBegin(GL_POINTS);
 	

@@ -1,7 +1,7 @@
 #pragma once
-#include "Vector.h"
+#include <glm/vec2.hpp>
 #include "Color.h"
 
-void BresenhamLine(CVec2f p1, CVec2f p2, Color c);
+void BresenhamLine(glm::vec2 p1, glm::vec2 p2, Color c);
 
-void BresenhamCircle (CVec2f p, int r, Color c);
+void BresenhamCircle (glm::vec2 p, int r, Color c);

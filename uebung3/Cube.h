@@ -2,23 +2,22 @@
 #define CUBE_H
 
 #include <array>
-#include "Vector.h"
+#include <glm/vec3.hpp>
 #include "Color.h"
-#include "Matrix.h"
 
 class Cube {
     private:
-        std::array<CVec3f, 8> cuboid;
+        std::array<glm::vec3, 8> cuboid;
         Color color;
-        CVec3f position;
+        glm::vec3 position;
         float size;
         float thetaX;
 
         void updateCuboid();
 
     public: 
-        Cube(CVec3f _center, float _size, Color _c);
-        void setPos(CVec3f pos) {
+        Cube(glm::vec3 _center, float _size, Color _c);
+        void setPos(glm::vec3 pos) {
             this->position = pos;
             updateCuboid();
         }
@@ -31,7 +30,7 @@ class Cube {
             return this->color;
         }
         
-        const std::array<CVec3f, 8> getCuboids() const {
+        const std::array<glm::vec3, 8> getCuboids() const {
             return this->cuboid;
         }
 };

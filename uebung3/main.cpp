@@ -4,11 +4,9 @@
 //										                                  //
 ////////////////////////////////////////////////////////////////////////////
 
-#include "Vector.h"
-#include "Matrix.h"
-
 #include <iostream>
 #include <vector>
+#include <map>
 
 // Include-File for GLUT-Library
 #include <GL/glut.h>
@@ -18,6 +16,7 @@
 #include "exercise6.h"
 #include "exercise7.h"
 #include "Camera.h"
+
 
 ////////////////////////////////////////////////////////////
 //
@@ -42,10 +41,11 @@ int g_iTimerMSecs;
 float g_iPos;			// ... position and ...
 float g_iPosIncr;		// ... position increment (used in display1)
 
-CVec2i g_vecPos;		// same as above but in vector form ...
-CVec2i g_vecPosIncr;	// (used in display2)
+glm::ivec2 g_vecPos;		// same as above but in vector form ...
+glm::ivec2 g_vecPosIncr;	// (used in display2)
 
-Camera g_camera(CVec3f(0, 0, -100), 100);
+Camera* g_camera;
+std::map<unsigned char, bool> keyStates; // Tracks the state of each key
 
 //
 /////////////////////////////////////////////////////////////
@@ -54,12 +54,16 @@ Camera g_camera(CVec3f(0, 0, -100), 100);
 void init () 
 {
 	std::vector<Cube*> actors;
-	actors.push_back(new Cube(CVec3f(150, 0, 10), 50, Color(1, 0, 0)));
-	actors.push_back(new Cube(CVec3f(-150, 0, 20), 50, Color(0, 1, 0)));
-	actors.push_back(new Cube(CVec3f(0, 150, 30), 50, Color(0, 0, 1)));
+	actors.push_back(new Cube(glm::vec3(25, 25, 25), 50, Color(1, 0, 0)));
+	// actors.push_back(new Cube(glm::vec3(150, 0, 20), 50, Color(0, 1, 0)));
+	// actors.push_back(new Cube(glm::vec3(0, 150, 30), 50, Color(0, 0, 1)));
 
-	g_camera = Camera(CVec3f(-100, 50, -100), 50);
-	g_camera.setCubes(actors);
+	if (g_camera != nullptr) {
+		delete g_camera;
+	}
+
+	g_camera = new Camera(glm::vec3(0, 0, -50), 50);
+	g_camera->setCubes(actors);
 	
 	// init timer interval
 	g_iTimerMSecs = 10;
@@ -69,10 +73,8 @@ void init ()
 	g_iPosIncr = 2;
 
 	// init variables for display2
-	int aiPos    [2] = {0, 0};
-	int aiPosIncr[2] = {2, 2};
-	g_vecPos.setData (aiPos);
-	g_vecPosIncr.setData (aiPosIncr);
+	g_vecPos = glm::ivec2({0, 0});
+	g_vecPosIncr = glm::ivec2({2, 2});
 }
 
 // Function to initialize the view to ortho-projection.
@@ -113,6 +115,7 @@ void timer (int value)
 	// UPDATE YOUR VARIABLES HERE ...
 	//
 
+
 	//
 	///////
 
@@ -137,7 +140,7 @@ void display5(void)
 {
 	glClear (GL_COLOR_BUFFER_BIT);	// clear the color buffer
 	
-	g_camera.render();
+	g_camera->render();
 
 	// In double buffer mode the last two lines should always be
 	glFlush ();
@@ -149,7 +152,7 @@ void display6(void)
 {
 	glClear (GL_COLOR_BUFFER_BIT);	// clear the color buffer
 
-	g_camera.render();
+	g_camera->render();
 
 	// In double buffer mode the last two lines should always be
 	glFlush ();
@@ -158,7 +161,6 @@ void display6(void)
 
 void keyboard (unsigned char key, int x, int y) 
 {
-	g_camera.handleKey(key);
 	switch (key) {
 		// case '5':
 		// 	glutDisplayFunc (display5);
@@ -178,6 +180,13 @@ void keyboard (unsigned char key, int x, int y)
 			// do nothing ...
 			break;
 	};
+	keyStates[key] = true; // Mark key as pressed
+	g_camera->handleKey(keyStates);
+	
+}
+
+void keyboardUp(unsigned char key, int x, int y) {
+    keyStates[key] = false; // Mark key as released
 }
 
 // The main
@@ -196,6 +205,8 @@ int main (int argc, char **argv)
 	glutReshapeFunc (reshape);			// is triggered on window size changes
 	glutDisplayFunc (display6);	// is triggered to redraw the viewport/display
 	glutKeyboardFunc(keyboard);			// is triggered on keyboard events
+	glutKeyboardFunc(keyboard);      // Called when a key is pressed
+	glutKeyboardUpFunc(keyboardUp);  // Called when a key is released
 
 	// start main loop
 	glutMainLoop ();

@@ -11,14 +11,13 @@
 #include "Color.h"
 #include "cg_math.h"
 
-
 Color::Color(double r, double g, double b) {
 	this->r = r;
 	this->g = g;
 	this->b = b;
 }
 
-Color::Color(const CVec3d& color)
+Color::Color(const glm::dvec3& color)
 {
 	this->r = crop(color[0]);
 	this->g = crop(color[1]);
@@ -34,7 +33,7 @@ double& Color::operator [] (int i) {
 	return r; // unreachable dummy	
 }
 
-Color Color::operator * (const CVec3d& x) const
+Color Color::operator * (const glm::dvec3& x) const
 {
 	return Color(r * x[0], g * x[1], b * x[2]);
 }

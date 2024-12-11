@@ -1,6 +1,8 @@
+INCLUDE = -I"../glm"
+
 # Compiler and flags
 CXX = g++
-CXXFLAGS = -Wall -std=c++11 -g
+CXXFLAGS = -Wall -std=c++11 -g $(INCLUDE)
 
 # Libraries
 LIBS = -lGL -lGLU -lglut

@@ -1,13 +1,13 @@
 #ifndef EXERCISE5_H
 #define EXERCISE5_H
 
-#include "Vector.h"
-#include "Matrix.h"
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
 #include "Color.h"
 
-CVec4f projectZ(float fFocus, CVec4f pView);
-void drawProjectedZ(CVec3f Points[8], Color c);
+glm::vec4 projectZ(float fFocus, glm::vec4 pView);
+void drawProjectedZ(glm::vec3 Points[8], Color c);
 
-void drawCuboid(CVec3f Cuboid[8], float fFocus, Color c);
+void drawCuboid(glm::vec3 Cuboid[8], float fFocus, Color c);
 
 #endif // EXERCISE5_H

@@ -3,29 +3,37 @@
 
 #include <vector>
 #include <iostream>
-#include "Cube.h"
+#include <map>
+#include <glm/mat4x4.hpp>
+#include <glm/vec4.hpp>
+#include <glm/vec3.hpp>
 
-#include "Vector.h"
-#include "Matrix.h"
+#include "Cube.h"
 
 class Camera {
     private: 
-        CVec4f viewOrigin;
-        CVec4f viewDir;
-        CVec4f viewUp;
+        glm::vec4 viewOrigin;
+        glm::vec4 viewDir;
+        glm::vec4 viewUp;
         float fFocus;
 
         std::vector<Cube*> cubes;
 
-        void setPose(CMat4f mat);
+        void setPose(const glm::mat4& mat);
 
     public:
-        Camera(CVec3f position, float focus)
+        Camera(glm::vec3 position, float focus)
          : fFocus(focus) {
-            viewOrigin = CVec4f(position, 1);
+            viewOrigin = glm::vec4(position, 1);
 
-            viewDir = CVec4f({0, 1, 0, 0});
-            viewUp = CVec4f({1, 0, 0, 0});
+            viewDir = glm::vec4({0, 1, 0, 0});
+            viewUp = glm::vec4({1, 0, 0, 0});
+        }
+
+        ~Camera() {
+            for(auto cube : cubes) {
+                delete cube;
+            }
         }
 
         void addCube(Cube* cube) {
@@ -48,14 +56,14 @@ class Camera {
         void rotateWorldY(float theta);
         void rotateWorldZ(float theta);
 
-        void setPos(CVec3f pos) {
-            viewOrigin = CVec4f(pos, 1);
+        void setPos(glm::vec3 pos) {
+            viewOrigin = glm::vec4(pos, 1);
         }
         void addX(float x);
         void addY(float y);
         void addZ(float z);
 
-        void handleKey(const unsigned char key);
+        void handleKey(std::map<unsigned char, bool> keyStates);
 };
 
 #endif // CAMERA_H

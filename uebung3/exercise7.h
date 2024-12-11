@@ -1,12 +1,12 @@
 #ifndef EXERCISE7_H
 #define EXERCISE7_H
 
-#include "Vector.h"
-#include "Matrix.h"
+#include <glm/mat4x4.hpp>
+#include <glm/vec4.hpp>
 
-CMat4f rotateMatrixX(float theta);
-CMat4f rotateMatrixY(float theta);
-CMat4f rotateMatrixZ(float theta);
-CMat4f translation(CVec4f t);
+glm::mat4x4 rotateMatrixX(float theta);
+glm::mat4x4 rotateMatrixY(float theta);
+glm::mat4x4 rotateMatrixZ(float theta);
+glm::mat4x4 translation(glm::vec4 t);
 
 #endif // EXERCISE7_H
