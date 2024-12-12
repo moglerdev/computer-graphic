@@ -1,6 +1,8 @@
+INCLUDE = -I"../glm"
+
 # Compiler and flags
 CXX = g++
-CXXFLAGS = -Wall -std=c++11 -g
+CXXFLAGS = -Wall -std=c++11 -g $(INCLUDE)
 
 # Libraries
 LIBS = -lGL -lGLU -lglut
@@ -13,8 +15,6 @@ WIN_INCLUDE = -I"..\freeglut\include"
 SRCS = $(wildcard *.cpp *.c)
 OBJS = $(SRCS:.cpp=.o)
 TARGET = uebung4.bin
-# Static linking specific flags (ensure we don't link dynamically)
-LDFLAGS = -static
 
 # Detect Windows
 ifeq ($(OS),Windows_NT)
@@ -27,7 +27,7 @@ endif
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $(TARGET) $(OBJS) $(LIBS)
+	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJS) $(LIBS)
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
