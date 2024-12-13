@@ -19,10 +19,13 @@ using namespace std;
 #include <GL/glut.h>
 
 // my own include-files
-#include "Vector.h"
+#include <glm/glm.hpp>
 #include "Color.h"
-#include "Sphere.h"
 #include "cg_math.h"
+#include "Sphere.h"
+
+#include "exercise8.h"
+#include "exercise9.h"
 
 /////////////////////////////////////////////////////////////
 // 
@@ -54,136 +57,17 @@ double light_inc     = 0.1;			// increment for angles in spherical angles for li
 double shininess_inc = 5.0;
 
 // scene parameters
-Sphere sphere(CVec3d(0, 0, 100), 50);
-unsigned material = 0;				// default = 0, brass = 1, bronze = 2
+Sphere sphere(glm::vec3(0, 0, 100), 50);
 
 // light source and camera parameters
-int A = -1;							// eye-point
-CVec3d affLight(   0,   1000, 0);	// affine    coordinates of light source, i.e. (x,y,z)
-CVec3d sphLight(1000, 1.5*PI, 0);	// spherical coordinates of light source, i.e. (radius, phi, psi)
+int A = -1; // eye-point
 Color  backColor = Color(0.8,0.8,0.8);
 
-// default illumination levels
-CVec3d ambientIllumination (0.1, 0.1, 0.1);
-CVec3d diffuseIllumination (1.0, 1.0, 1.0);
-CVec3d specularIllumination(0.5, 0.5, 0.5);
-
-// default reflection coefficients
-Color  specularColor(0.5,0.5,0.5);	// specular color, aka color of light source
-Color  ambientColor (0.5,0.5,0.5);	// ambient color , aka color of environment
-Color  diffuseColor (1.0,1.0,1.0);	// diffuse color , aka color of object
-double shininess = 28.0;			// shininess
-
-// other reflection coefficients
-// brass ( dt. Messing)
-Color  ambientBrass   = Color(0.33,0.22,0.03);
-Color  diffuseBrass   = Color(0.78,0.57,0.11);
-Color  specularBrass  = Color(0.99,0.94,0.81);
-double shininessBrass = 28.0;
-// bronze
-Color  ambientBronze   = Color(0.21,0.13,0.05);
-Color  diffuseBronze   = Color(0.71,0.43,0.18);
-Color  specularBronze  = Color(0.39,0.27,0.17);
-double shininessBronze = 26.0;
+Light light(1000.0, 1.5*PI, 0);
 
 // forward declarations
 void clearTexture (                 const Color& c = backColor);
-void setPixel     (const CVec2i& p, const Color& c = backColor);
-
-/////////////////////////////////////////////////////////////
-// 
-// YOUR FUNCTIONS
-// 
-///////////////////////////////////////////////////////////// 
-
-CVec3d intersectSphere( const CVec3d& EyePos, const CVec3d& ViewDir) 
-{
-	////////////////////////////////////////////////////////////	
-	// 
-	// This is the place to implement a sphere-ray-intersection
-	// 
-	////////////////////////////////////////////////////////////
-
-	return CVec3d(0,0,-1);
-}
-
-Color illumination(const CVec3d& HitPos, const CVec3d& ViewDir) 
-{	
-	// reflection coefficients
-	// reflection coefficients
-	Color  Ka, Kd, Ks;					// ambient, diffuse, specular material coefficients
-	double shi;							// shininess
-	switch (material) {
-	default:
-	case 0:	// default color
-		Ka  = ambientColor;				// ambient   material coefficient
-		Kd  = diffuseColor;				// diffuse   material coefficient
-		Ks  = specularColor;			// specular  material coefficient
-		shi = shininess;				// shininess material coefficient
-		break;
-	case 1:	// brass
-		Ka  = ambientBrass;				// ambient   material coefficient
-		Kd  = diffuseBrass;				// diffuse   material coefficient
-		Ks  = specularBrass;			// specular  material coefficient
-		shi = shininessBrass;			// shininess material coefficient
-		break;
-	case 2:	// bronze
-		Ka  = ambientBronze;			// ambient   material coefficient
-		Kd  = diffuseBronze;			// diffuse   material coefficient
-		Ks  = specularBronze;			// specular  material coefficient
-		shi = shininessBronze;			// shininess material coefficient
-		break;
-	}
-
-	// illumination levels
-	CVec3d Ia = ambientIllumination;	// ambient  illumination level
-	CVec3d Id = diffuseIllumination;	// diffuse  illumination level
-	CVec3d Is = specularIllumination;	// specular illumination level						
-
-	////////////////////////////////////////////////////////////	
-	// 
-	// This is the place to implement Phong illumination
-	// 
-	CVec3d LightPos   = affLight;
-	Color  pixelColor = backColor;
-	// 
-	// Please try different parameter settings for Ka, Ks, Kd, shi, Ia, Id, Is
-	// 
-	////////////////////////////////////////////////////////////
-
-	return pixelColor;
-}
-
-// This function controls and triggers the rendering process
-void rayCast() 
-{
-	clearTexture(backColor);
-
-	CVec3d eyePoint = CVec3d(0.0,0.0, A);	// eye-point
-	CVec3d viewDir  = CVec3d(0.0,0.0,-A);	// view-direction
-	CVec3d hitPoint;
-	Color  pixelColor;
-
-	// iterate over the pixels
-	for (int x = 0; x < TEX_RES_X; x++) {
-		for (int y = 0; y < TEX_RES_Y; y++) {
-			// convert viewport to view window
-			viewDir[0] = -1 + 2*x / static_cast<float>(TEX_RES_X -1);
-			viewDir[1] = -1 + 2*y / static_cast<float>(TEX_RES_Y -1);
-
-			// compute scene point covered by pixel
-			hitPoint = intersectSphere(eyePoint,viewDir);
-
-			// compute pixel color
-			pixelColor = backColor; // background color
-			if (hitPoint[2] != -1) pixelColor = illumination(hitPoint, viewDir);
-
-			// draw the pixel
-			setPixel(CVec2i(x, y), pixelColor);
-		}
-	}
-	cout << "raycast done" << endl;
-}
+void setPixel     (const glm::ivec2& p, const Color& c = backColor);
 
 
 /////////////////////////////////////////////////////////////
@@ -252,20 +136,9 @@ void reshape(int w, int h)
 	glutPostRedisplay ();
 }
 
-// Function clears the texture and fills it with color c.
-// Please do not change!
-void clearTexture (const Color& c) 
-{
-	for (int i=0; i<TEX_RES; i++) {
-		g_Buffer[3 * i    ] = char(255.0 * c.r);
-		g_Buffer[3 * i + 1] = char(255.0 * c.g);
-		g_Buffer[3 * i + 2] = char(255.0 * c.b);
-	}
-}
-
 // Function plots a pixel p with color c to the texture. 
 // Please do not change it, but use it!
-void setPixel(const CVec2i& p, const Color& c) 
+void setPixel(const glm::ivec2& p, const Color& c) 
 {
 	if (p[0] < 0 || p[1] < 0 || p[0] > TEX_RES_X || p[1] > TEX_RES_Y) {
 		cerr << "Illegal pixel co-ordinates (" << p[0] << ", " << p[1] << ")\n" << flush;
@@ -296,11 +169,19 @@ void init()
 	rayCast();
 }
 
+std::string vec3ToString(glm::vec3 vec) {
+	std::string x;
+	x += "(";
+	for (unsigned j = 0; j < 3; j++) x += to_string(vec[j]) + ",";
+	x += to_string(vec[2]) + ")";
+	return x;
+}
+
 // Callback function to handle keyboard input.
 // Please do not change!
 void keyboard(unsigned char c, int x, int y) 
 {
-	CVec3d inc(illum_inc,illum_inc,illum_inc);
+	glm::vec3 inc(illum_inc,illum_inc,illum_inc);
 	switch (c) {
 
 		/////////////////////////////////
@@ -393,9 +274,9 @@ void keyboard(unsigned char c, int x, int y)
 			cout << "Use 'q' or 'Q'                       to quit"											<< endl; 
 			break;
 	}
-	cout << "Diffuse  color and illumination level: "	<< diffuseColor  << ", " << diffuseIllumination		<< endl;
-	cout << "Specular color and illumination level: "	<< specularColor << ", " << specularIllumination	<< endl;
-	cout << "Ambient  color and illumination level: "	<< ambientColor  << ", " << ambientIllumination		<< endl;
+	cout << "Diffuse  color and illumination level: "	<< diffuseColor  << ", " << vec3ToString(diffuseIllumination)		<< endl;
+	cout << "Specular color and illumination level: "	<< specularColor << ", " << vec3ToString(specularIllumination)	<< endl;
+	cout << "Ambient  color and illumination level: "	<< ambientColor  << ", " << vec3ToString(ambientIllumination)		<< endl;
 	cout << "Shininess :"								<< shininess										<< endl;
 	cout << "Material: "								<< material											<< endl;
 
