@@ -21,44 +21,39 @@ void Camera::render() {
 }
 
 void Camera::setPose(const glm::mat4& mat) {
+    viewOrigin = mat * viewOrigin;
     viewDir = glm::normalize(mat * viewDir);
     viewUp = glm::normalize(mat * viewUp);
 }
 
 void Camera::rotateWorldX(float theta) {
 	glm::mat4 mat = rotateMatrixX(theta);
-    viewOrigin = mat * viewOrigin;
 	setPose(mat);
 }
 void Camera::rotateWorldY(float theta) {
 	glm::mat4 mat = rotateMatrixY(theta);
-    viewOrigin = mat * viewOrigin;
 	setPose(mat);
 }
 void Camera::rotateWorldZ(float theta) {
 	glm::mat4 mat = rotateMatrixZ(theta);
-    viewOrigin = mat * viewOrigin;
 	setPose(mat);
 }
 
 void Camera::rotateLocalX(float theta) {
     // Rotate around the local X-axis (viewRight)
 	glm::mat4 mat = translation(viewOrigin) * rotateMatrixX(theta) * translation(-viewOrigin);
-    viewOrigin = mat * viewOrigin;
 	setPose(mat);
 }
 
 void Camera::rotateLocalY(float theta) {
     // Rotate around the local Y-axis (viewUp)
 	glm::mat4 mat = translation(viewOrigin) * rotateMatrixY(theta) * translation(-viewOrigin);
-    viewOrigin = mat * viewOrigin;
 	setPose(mat);
 }
 
 void Camera::rotateLocalZ(float theta) {
     // Rotate around the local Z-axis (viewDir)
 	glm::mat4 mat = translation(viewOrigin) * rotateMatrixZ(theta) * translation(-viewOrigin);
-    viewOrigin = mat * viewOrigin;
 	setPose(mat);
 }
 
