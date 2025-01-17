@@ -9,7 +9,7 @@
 ////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "Vector.h"
+#include <glm/glm.hpp>
 #include <iostream>
 
 class Color {
@@ -19,10 +19,12 @@ public:
 public:
 
 	Color(double r = 1.0, double g = 1.0, double b = 1.0);
-	Color(const CVec3d& color);
+	Color(const glm::vec3& color);
 
 	double& operator [] (int i);
-	Color   operator * (const CVec3d& x) const;		// Hadamar product
+	Color   operator * (const glm::vec3& x) const;		// Hadamar product
+
+	glm::vec3 toVec3() const { return glm::vec3(r, g, b); }
 };
 
 std::ostream& operator << (std::ostream& os, const Color& c);

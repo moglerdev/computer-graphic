@@ -17,9 +17,9 @@ double crop(double x, double l, double u)
 }
 
 // crop all componentens of x to interval [l,u]
-CVec3d crop(const CVec3d& x, double l, double u)
+glm::vec3 crop(const glm::vec3& x, double l, double u)
 {
-	return CVec3d(crop(x[0], l, u), crop(x[1], l, u), crop(x[2], l, u));
+	return glm::vec3(crop(x[0], l, u), crop(x[1], l, u), crop(x[2], l, u));
 }
 
 // crop all componentens of x to interval [l,u]
@@ -31,9 +31,9 @@ Color crop(const Color& x, double l, double u)
 // spherical to affine coordinates
 // (x) PI <= XZ <= 2Pi (X)
 // (y) 0 <= YZ <= PI (Y)
-CVec3d SphericalToAffine(const CVec3d& sphericalCoordinates) 
+glm::vec3 SphericalToAffine(const glm::vec3& sphericalCoordinates) 
 {
-	CVec3d affineCoordinates;
+	glm::vec3 affineCoordinates;
 	affineCoordinates[0] = sphericalCoordinates[0] * sin(sphericalCoordinates[2]) * cos(sphericalCoordinates[1]);
 	affineCoordinates[2] = sphericalCoordinates[0] * sin(sphericalCoordinates[2]) * sin(sphericalCoordinates[1]);
 	affineCoordinates[1] = sphericalCoordinates[0] * cos(sphericalCoordinates[2]);

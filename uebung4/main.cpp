@@ -15,11 +15,13 @@
 #include <iostream>
 using namespace std;
 
+#include <glm/glm.hpp>
+
 // include-file for GLUT-Library
 #include <GL/glut.h>
+#include <cmath>
 
 // my own include-files
-#include "Vector.h"
 #include "Color.h"
 #include "Sphere.h"
 #include "cg_math.h"
@@ -54,19 +56,19 @@ double light_inc     = 0.1;			// increment for angles in spherical angles for li
 double shininess_inc = 5.0;
 
 // scene parameters
-Sphere sphere(CVec3d(0, 0, 100), 50);
+Sphere sphere(glm::vec3(0, 0, 100), 50);
 unsigned material = 0;				// default = 0, brass = 1, bronze = 2
 
 // light source and camera parameters
 int A = -1;							// eye-point
-CVec3d affLight(   0,   1000, 0);	// affine    coordinates of light source, i.e. (x,y,z)
-CVec3d sphLight(1000, 1.5*PI, 0);	// spherical coordinates of light source, i.e. (radius, phi, psi)
+glm::vec3 affLight(   0,   1000, 0);	// affine    coordinates of light source, i.e. (x,y,z)
+glm::vec3 sphLight(1000, 1.5*PI, 0);	// spherical coordinates of light source, i.e. (radius, phi, psi)
 Color  backColor = Color(0.8,0.8,0.8);
 
 // default illumination levels
-CVec3d ambientIllumination (0.1, 0.1, 0.1);
-CVec3d diffuseIllumination (1.0, 1.0, 1.0);
-CVec3d specularIllumination(0.5, 0.5, 0.5);
+glm::vec3 ambientIllumination (0.1, 0.1, 0.1);
+glm::vec3 diffuseIllumination (1.0, 1.0, 1.0);
+glm::vec3 specularIllumination(0.5, 0.5, 0.5);
 
 // default reflection coefficients
 Color  specularColor(0.5,0.5,0.5);	// specular color, aka color of light source
@@ -88,7 +90,7 @@ double shininessBronze = 26.0;
 
 // forward declarations
 void clearTexture (                 const Color& c = backColor);
-void setPixel     (const CVec2i& p, const Color& c = backColor);
+void setPixel     (const glm::ivec2& p, const Color& c = backColor);
 
 /////////////////////////////////////////////////////////////
 // 
@@ -96,72 +98,110 @@ void setPixel     (const CVec2i& p, const Color& c = backColor);
 // 
 ///////////////////////////////////////////////////////////// 
 
-CVec3d intersectSphere( const CVec3d& EyePos, const CVec3d& ViewDir) 
+glm::vec3 intersectSphere(const Sphere& sphere, const glm::vec3& EyePos, const glm::vec3& ViewDir) 
 {
-	////////////////////////////////////////////////////////////	
-	// 
-	// This is the place to implement a sphere-ray-intersection
-	// 
-	////////////////////////////////////////////////////////////
+    // Sphere center and radius
+    const glm::vec3& M = sphere.getCenter(); // Sphere center
+    const double& r = sphere.getRadius();    // Sphere radius
 
-	return CVec3d(0,0,-1);
+    // Ray origin and direction
+    const glm::vec3& O = EyePos;  // Ray origin
+    const glm::vec3& D = ViewDir; // Ray direction (should be normalized)
+
+    // Compute the coefficients of the quadratic equation
+    glm::vec3 OC = O - M;
+    double a = glm::dot(D, D);                        // Dot product of D with itself
+    double b = 2.0 * glm::dot(D, OC);                 // 2 * dot(D, OC)
+    double c = glm::dot(OC, OC) - r * r;              // dot(OC, OC) - r^2
+
+    // Discriminant
+    double discriminant = b * b - 4.0 * a * c;
+
+    // If the discriminant is negative, no intersection
+    if (discriminant < 0.0) {
+        return glm::vec3(0, 0, -1); // Indicate no intersection
+    }
+
+    // Solve the quadratic equation for t
+    double sqrtDiscriminant = sqrt(discriminant);
+    double t1 = (-b - sqrtDiscriminant) / (2.0 * a);
+    double t2 = (-b + sqrtDiscriminant) / (2.0 * a);
+
+    // Choose the nearest positive t
+    float t = (t1 > 0) ? t1 : ((t2 > 0) ? t2 : -1.0);
+
+    // If no positive t, the sphere is behind the ray
+    if (t < 0.0) {
+        return glm::vec3(0, 0, -1); // Indicate no intersection
+    }
+
+    // Compute the intersection point
+    return O + t * D; // This line should work fine now
 }
 
-Color illumination(const CVec3d& HitPos, const CVec3d& ViewDir) 
+Color illumination(const glm::vec3& HitPos, const glm::vec3& ViewDir) 
 {	
-	// reflection coefficients
-	// reflection coefficients
-	Color  Ka, Kd, Ks;					// ambient, diffuse, specular material coefficients
-	double shi;							// shininess
-	switch (material) {
-	default:
-	case 0:	// default color
-		Ka  = ambientColor;				// ambient   material coefficient
-		Kd  = diffuseColor;				// diffuse   material coefficient
-		Ks  = specularColor;			// specular  material coefficient
-		shi = shininess;				// shininess material coefficient
-		break;
-	case 1:	// brass
-		Ka  = ambientBrass;				// ambient   material coefficient
-		Kd  = diffuseBrass;				// diffuse   material coefficient
-		Ks  = specularBrass;			// specular  material coefficient
-		shi = shininessBrass;			// shininess material coefficient
-		break;
-	case 2:	// bronze
-		Ka  = ambientBronze;			// ambient   material coefficient
-		Kd  = diffuseBronze;			// diffuse   material coefficient
-		Ks  = specularBronze;			// specular  material coefficient
-		shi = shininessBronze;			// shininess material coefficient
-		break;
-	}
+    // Reflection coefficients
+    Color Ka, Kd, Ks; // ambient, diffuse, specular material coefficients
+    float shi; // Shininess
 
-	// illumination levels
-	CVec3d Ia = ambientIllumination;	// ambient  illumination level
-	CVec3d Id = diffuseIllumination;	// diffuse  illumination level
-	CVec3d Is = specularIllumination;	// specular illumination level						
+    // Choose material properties based on material type
+    switch (material) {
+    default:
+    case 0:  // default color
+        Ka = ambientColor;
+        Kd = diffuseColor;
+        Ks = specularColor;
+        shi = shininess;
+        break;
+    case 1:  // brass
+        Ka = ambientBrass;
+        Kd = diffuseBrass;
+        Ks = specularBrass;
+        shi = shininessBrass;
+        break;
+    case 2:  // bronze
+        Ka = ambientBronze;
+        Kd = diffuseBronze;
+        Ks = specularBronze;
+        shi = shininessBronze;
+        break;
+    }
 
-	////////////////////////////////////////////////////////////	
-	// 
-	// This is the place to implement Phong illumination
-	// 
-	CVec3d LightPos   = affLight;
-	Color  pixelColor = backColor;
-	// 
-	// Please try different parameter settings for Ka, Ks, Kd, shi, Ia, Id, Is
-	// 
-	////////////////////////////////////////////////////////////
+    // Illumination levels
+    glm::vec3 Ia = ambientIllumination;  // Ambient illumination level
+    glm::vec3 Id = diffuseIllumination; // Diffuse illumination level
+    glm::vec3 Is = specularIllumination; // Specular illumination level
 
-	return pixelColor;
+    // Light position
+    glm::vec3 LightPos = affLight;
+
+    // Compute normal, light direction, and reflection vector
+    glm::vec3 N = glm::normalize(HitPos - sphere.getCenter()); // Surface normal
+    glm::vec3 L = glm::normalize(LightPos - HitPos);           // Light direction
+    glm::vec3 R = glm::normalize(2.0f * glm::dot(N, L) * N - L); // Reflection vector
+    glm::vec3 V = -glm::normalize(ViewDir);                    // View direction (normalize)
+
+    // Compute the ambient, diffuse, and specular components
+    glm::vec3 ambient = Ka.toVec3() * Ia; // Ambient component
+    glm::vec3 diffuse = Kd.toVec3() * Id * std::max(glm::dot(L, N), 0.0f); // Diffuse component
+    glm::vec3 specular = Ks.toVec3() * Is * pow(std::max(glm::dot(R, V), 0.0f), shi); // Specular component
+
+    // Combine the components to get the final color
+    Color pixelColor = ambient + diffuse + specular;
+
+    return pixelColor;
 }
+
 
 // This function controls and triggers the rendering process
 void rayCast() 
 {
 	clearTexture(backColor);
 
-	CVec3d eyePoint = CVec3d(0.0,0.0, A);	// eye-point
-	CVec3d viewDir  = CVec3d(0.0,0.0,-A);	// view-direction
-	CVec3d hitPoint;
+	glm::vec3 eyePoint = glm::vec3(0.0,0.0, A);	// eye-point
+	glm::vec3 viewDir  = glm::vec3(0.0,0.0,-A);	// view-direction
+	glm::vec3 hitPoint;
 	Color  pixelColor;
 
 	// iterate over the pixels
@@ -172,14 +212,14 @@ void rayCast()
 			viewDir[1] = -1 + 2*y / static_cast<float>(TEX_RES_Y -1);
 
 			// compute scene point covered by pixel
-			hitPoint = intersectSphere(eyePoint,viewDir);
+			hitPoint = intersectSphere(sphere, eyePoint, viewDir);
 
 			// compute pixel color
 			pixelColor = backColor; // background color
 			if (hitPoint[2] != -1) pixelColor = illumination(hitPoint, viewDir);
 
 			// draw the pixel
-			setPixel(CVec2i(x, y), pixelColor);
+			setPixel(glm::ivec2(x, y), pixelColor);
 		}
 	}
 	cout << "raycast done" << endl;
@@ -265,7 +305,7 @@ void clearTexture (const Color& c)
 
 // Function plots a pixel p with color c to the texture. 
 // Please do not change it, but use it!
-void setPixel(const CVec2i& p, const Color& c) 
+void setPixel(const glm::ivec2& p, const Color& c) 
 {
 	if (p[0] < 0 || p[1] < 0 || p[0] > TEX_RES_X || p[1] > TEX_RES_Y) {
 		cerr << "Illegal pixel co-ordinates (" << p[0] << ", " << p[1] << ")\n" << flush;
@@ -300,7 +340,7 @@ void init()
 // Please do not change!
 void keyboard(unsigned char c, int x, int y) 
 {
-	CVec3d inc(illum_inc,illum_inc,illum_inc);
+	glm::vec3 inc(illum_inc,illum_inc,illum_inc);
 	switch (c) {
 
 		/////////////////////////////////
